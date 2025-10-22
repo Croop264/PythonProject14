@@ -68,7 +68,11 @@ is_jump = False
 jump_count = 5
 screen.fill("#a0b0f0")
 enemy_timer = pygame.USEREVENT + 1
-pygame.time.set_timer(enemy_timer, 1)
+pygame.time.set_timer(enemy_timer, 5000)
+label = pygame.font.SysFont('notosans',50)
+label_end = label.render('You Lose',True,'#FFFFFF')
+restart_label = label.render('restart',True,'#FFFFFF')
+restart_label_rect = restart_label.get_rect(topleft=(500,200))
 gp = True
 while run:
     screen.blit(bg, (bg_x, 0))
@@ -77,9 +81,12 @@ while run:
         player_rect = walk_left[0].get_rect(topleft=(player_x + 48, player_y + 48))
 
         if enemy_list:
-            for el in enemy_list:
+            for (i, el) in enumerate(enemy_list):
                 screen.blit(enemy, el)
                 el.x -= 10
+
+                if el.x < -45:
+                    enemy_list.pop(i)
 
                 if player_rect.colliderect(el):
                     gp = False
@@ -123,6 +130,11 @@ while run:
             bg_x = 0
     else:
         screen.fill('#1e1e1e')
+        screen.blit(label_end,(500,100))
+        screen.blit(restart_label,restart_label_rect)
+        mouse = pygame.mouse.get_pos()
+        if restart_label_rect.collidepoint(mouse) and pygame.mouse.get_pressed()[0]:
+            gp = True
     pygame.display.update()
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
