@@ -7,56 +7,56 @@ clockk = pygame.time.Clock()
 pygame.init()
 screen = pygame.display.set_mode((1200, 360), vsync=1)
 pygame.display.set_caption("name")
-icon = pygame.image.load("img.png")
+icon = pygame.image.load("img.png").convert_alpha()
 pygame.display.set_icon(icon)
 square = pygame.Surface((50, 150))
 square.fill("#fff000")
 run = True
 my_font = pygame.font.SysFont('notosans', 20)
 text_surf = my_font.render("HUBUVBWUIRO", False, "#000000")
-bg = pygame.image.load("bg.png")
+bg = pygame.image.load("bg.png").convert()
 bg = pygame.transform.scale(bg, (1200, 360))
 bg_sound = pygame.mixer.Sound("sounds/soundtrack.ogg")
 bg_sound.play()
 enemy_list = []
 walk_left = [
-    pygame.image.load('walk/title000_l.png'),
-    pygame.image.load('walk/title001_l.png'),
-    pygame.image.load('walk/title002_l.png'),
-    pygame.image.load('walk/title003_l.png'),
-    pygame.image.load('walk/title004_l.png'),
-    pygame.image.load('walk/title005_l.png'),
-    pygame.image.load('walk/title006_l.png'),
-    pygame.image.load('walk/title007_l.png'),
-    pygame.image.load('walk/title008_l.png'),
-    pygame.image.load('walk/title009_l.png')
+    pygame.image.load('walk/title000_l.png').convert_alpha(),
+    pygame.image.load('walk/title001_l.png').convert_alpha(),
+    pygame.image.load('walk/title002_l.png').convert_alpha(),
+    pygame.image.load('walk/title003_l.png').convert_alpha(),
+    pygame.image.load('walk/title004_l.png').convert_alpha(),
+    pygame.image.load('walk/title005_l.png').convert_alpha(),
+    pygame.image.load('walk/title006_l.png').convert_alpha(),
+    pygame.image.load('walk/title007_l.png').convert_alpha(),
+    pygame.image.load('walk/title008_l.png').convert_alpha(),
+    pygame.image.load('walk/title009_l.png').convert_alpha()
 ]
 walk_right = [
-    pygame.image.load('walk/tile000.png'),
-    pygame.image.load('walk/tile001.png'),
-    pygame.image.load('walk/tile002.png'),
-    pygame.image.load('walk/tile003.png'),
-    pygame.image.load('walk/tile004.png'),
-    pygame.image.load('walk/tile005.png'),
-    pygame.image.load('walk/tile006.png'),
-    pygame.image.load('walk/tile007.png'),
-    pygame.image.load('walk/tile008.png'),
-    pygame.image.load('walk/tile009.png')
+    pygame.image.load('walk/tile000.png').convert_alpha(),
+    pygame.image.load('walk/tile001.png').convert_alpha(),
+    pygame.image.load('walk/tile002.png').convert_alpha(),
+    pygame.image.load('walk/tile003.png').convert_alpha(),
+    pygame.image.load('walk/tile004.png').convert_alpha(),
+    pygame.image.load('walk/tile005.png').convert_alpha(),
+    pygame.image.load('walk/tile006.png').convert_alpha(),
+    pygame.image.load('walk/tile007.png').convert_alpha(),
+    pygame.image.load('walk/tile008.png').convert_alpha(),
+    pygame.image.load('walk/tile009.png').convert_alpha()
 ]
 player_jump = [
-    pygame.image.load('jump/jump000.png'),
-    pygame.image.load('jump/jump001.png'),
-    pygame.image.load('jump/jump002.png'),
-    pygame.image.load('jump/jump003.png'),
-    pygame.image.load('jump/jump004.png'),
-    pygame.image.load('jump/jump005.png'),
-    pygame.image.load('jump/jump006.png'),
-    pygame.image.load('jump/jump007.png'),
-    pygame.image.load('jump/jump008.png'),
-    pygame.image.load('jump/jump009.png')
+    pygame.image.load('jump/jump000.png').convert_alpha(),
+    pygame.image.load('jump/jump001.png').convert_alpha(),
+    pygame.image.load('jump/jump002.png').convert_alpha(),
+    pygame.image.load('jump/jump003.png').convert_alpha(),
+    pygame.image.load('jump/jump004.png').convert_alpha(),
+    pygame.image.load('jump/jump005.png').convert_alpha(),
+    pygame.image.load('jump/jump006.png').convert_alpha(),
+    pygame.image.load('jump/jump007.png').convert_alpha(),
+    pygame.image.load('jump/jump008.png').convert_alpha(),
+    pygame.image.load('jump/jump009.png').convert_alpha()
     # pygame.transform.flip()
 ]
-enemy = pygame.image.load('enemy.jpg')
+enemy = pygame.image.load('enemy.jpg').convert()
 enemy_x = 1200
 player_frames = 0
 player_jump_frames = 0
@@ -73,6 +73,10 @@ label = pygame.font.SysFont('notosans',50)
 label_end = label.render('You Lose',True,'#FFFFFF')
 restart_label = label.render('restart',True,'#FFFFFF')
 restart_label_rect = restart_label.get_rect(topleft=(500,200))
+bullet = pygame.image.load("bullet.png").convert_alpha()
+bullet = pygame.transform.scale(bullet,(10,50))
+bullet = pygame.transform.rotate(bullet,270)
+bullets = []
 gp = True
 while run:
     screen.blit(bg, (bg_x, 0))
@@ -128,6 +132,19 @@ while run:
         enemy_x -= 10
         if bg_x == 1200:
             bg_x = 0
+        if gp == True and pygame.mouse.get_pressed()[0]:
+            bullets.append(bullet.get_rect(topleft=(player_x + 75,player_y + 75)))
+        if bullets:
+            for (i,el) in enumerate(bullets):
+                screen.blit(bullet,(el.x,el.y))
+                el.x += 4
+                if el.x > 1200:
+                    bullets.pop(i)
+                if enemy_list:
+                    for (ind,enemy) in enumerate(enemy_list):
+                        if el.colliderect(enemy):
+                            enemy_list.pop(ind)
+                            bullets.pop(i)
     else:
         screen.fill('#1e1e1e')
         screen.blit(label_end,(500,100))
@@ -135,6 +152,12 @@ while run:
         mouse = pygame.mouse.get_pos()
         if restart_label_rect.collidepoint(mouse) and pygame.mouse.get_pressed()[0]:
             gp = True
+            enemy_list.clear()
+            player_x = 150
+            bg_sound.stop()
+            bg_sound.play()
+            bg_x = 0
+            bullets.clear()
     pygame.display.update()
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
