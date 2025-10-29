@@ -77,6 +77,7 @@ bullet = pygame.image.load("bullet.png").convert_alpha()
 bullet = pygame.transform.scale(bullet,(10,50))
 bullet = pygame.transform.rotate(bullet,270)
 bullets = []
+ammo = 10
 gp = True
 while run:
     screen.blit(bg, (bg_x, 0))
@@ -132,8 +133,9 @@ while run:
         enemy_x -= 10
         if bg_x == 1200:
             bg_x = 0
-        if gp == True and pygame.mouse.get_pressed()[0]:
+        if gp == True and pygame.mouse.get_pressed()[0] and ammo > 0:
             bullets.append(bullet.get_rect(topleft=(player_x + 75,player_y + 75)))
+            ammo -=1
         if bullets:
             for (i,el) in enumerate(bullets):
                 screen.blit(bullet,(el.x,el.y))
@@ -141,8 +143,8 @@ while run:
                 if el.x > 1200:
                     bullets.pop(i)
                 if enemy_list:
-                    for (ind,enemy) in enumerate(enemy_list):
-                        if el.colliderect(enemy):
+                    for (ind,enemy_el) in enumerate(enemy_list):
+                        if el.colliderect(enemy_el):
                             enemy_list.pop(ind)
                             bullets.pop(i)
     else:
